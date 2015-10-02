@@ -1,0 +1,369 @@
+<h1 style="font-size:150%;"> Tale 4: pretty plot of the perovskite structure using escher</h1>
+<div style="font-size:90%;">
+**Scripts** ([http://gatsby.ucmerced.edu/downloads/tales/004/simple.m simple] [http://gatsby.ucmerced.edu/downloads/tales/004/agtao3.m final]), **Data** ([http://gatsby.ucmerced.edu/downloads/tales/004/POSCAR POSCAR] [http://gatsby.ucmerced.edu/downloads/tales/004/POTCAR POTCAR])</div>
+
+In a recent article <cite>agtao3</cite>, we helped develop an
+empirical model for silver tantalate (AgTaO<sub>3</sub>) by performing
+density-functional theory (DFT) calculations for this solid. Ashlie
+Martini and [her group](http://faculty.ucmerced.edu/amartini/) work in
+tribology (that is, the study of friction) and silver tantalate turns
+out to be a promising solid-state lubricant for high-temperature
+applications, whose syntehsis only very recently has become
+economically feasible. Tribological studies, however, require
+molecular dynamics (MD) simulations well beyond what DFT can do, at
+least with our current computational resources. Hence, the design of a
+reliable model potential for AgTaO<sub>3</sub> is imperative in order
+to progress with the study of this new material. After some rather
+disappointing attempts at fitting a shell-model-type of force field
+using GULP, we turned to the modified embedded atom method (MEAM),
+which requires pieces of ab initio information such as the equilibrium
+geometry, the cohesive energy and the elastic constants.
+
+At room temperature and pressure, silver tantalate has a [perovskite
+structure](http://en.wikipedia.org/wiki/Perovskite_(structure)).  The
+eponymous mineral (CaTiO<sub>3</sub>) is the representative ideal
+structure of a family which occurs in many oxides, including some of
+mineralogical (MgSiO<sub>3</sub>, which appears in the lower mantle)
+and of fundamental interest (e.g. ferroelectric BaTiO<sub>3</sub>,
+among others). In the ideal perovskite structure of AgTaO<sub>3</sub>,
+the Ta atom (which is formally a +5 cation) sits at the center of a
+octahedron of oxygens, and these octahedra share vertices forming a
+three-dimensional cubic structure. The Ag cations (+1), which are
+considerably larger than the Ta, occupy the voids left by the
+lattice of octahedra. Like most perovskites, however, the structure is
+not perfectly cubic because the octahedra rotate relative to each
+other, resulting in a lower-symmetry rhombohedral arrangement. Also
+like most perovskites, the angle between octahedra is labile and at
+higher temperatures, phase transitions occur to higher
+symmetry---first tetrahedral, then cubic---caused by thermal averaging
+over the angles.
+
+In this Tale, I explain how to create a plot of the unit cell of
+silver tantalate, similar to those found in <cite>agtao3</cite>, using
+[[escher]] and files belonging to a VASP calculation. The source files
+are the
+[POSCAR](http://gatsby.ucmerced.edu/downloads/tales/004/POSCAR) and
+the
+[POTCAR](http://gatsby.ucmerced.edu/downloads/tales/004/POTCAR). For
+those of you who are not familiar with VASP, the POSCAR is a file that
+specifies the crystal geometry. It looks like this:
+
+    molecular plot                          
+       1.00000000000000     
+         2.7138509032639644    1.5668425495399640    4.5773092115067548
+        -2.7138509032639644    1.5668425495399640    4.5773092115067548
+         0.0000000000000000   -3.1336850990799179    4.5773092115067548
+       2   2   6
+    Direct
+      0.2500000000000000  0.2500000000000000  0.2500000000000000
+      [...]
+
+The first line is the title and the second is a scaling factor for the
+lattice vectors, which in this case does nothing. Lines 2 through 5
+are the cell vectors in angstrom. They form a matrix <math>R</math>
+from which the metric tensor can be generated as <math>G =
+RR^T</math>. Line number six is the number of atoms of each type in
+the molecular motif. The primitive cell of AgTaO<sub>3</sub> contains
+two Ag, two Ta and six O. The crystallographic coordinates of the ten
+atoms, in order, appear at the end of the of the file. 
+
+The POSCAR does not contain the actual atomic species, which is why
+the POTCAR is needed as well. This file contains a description of the
+pseudopotentials for the atomic types in the order of the POSCAR and
+is usually built from the VASP's own library.  Escher scans through it
+to determine the atomic names and numbers of the different atom types.
+
+We'll first try to create a simple plot for silver tantalate by feeding
+the geometry into escher and using all the defaults. To do this, I
+wrote [this octave
+script](http://gatsby.ucmerced.edu/downloads/tales/004/simple.m),
+which I explain line by line below. The crystal structure is first
+read by passing the POSCAR and the POTCAR to cr_read_vasp:
+
+    cr = cr_read_vasp("POSCAR","POTCAR");
+
+The cr_read_vasp routine belongs to the [[escher]] code. Its function
+is to take the name of the two VASP-style files, read them, and
+produce a crystal 'object'. That is, the description of the crystal
+structure in the octave cell array representation which escher handles
+internally. The escher routines, particularly the more complex ones
+shown below, can have many arguments, but the documentation can always
+be consulted by opening an interactive session of octave and doing,
+for instance, 'help cr_read_vasp'.
+
+A crystal as described in VASP (and in escher) is periodic an
+infinite. In order to build a graphical representation, we'll need to
+take a small piece of it. There are several ways of doing this in
+escher: taking a sphere (cr_spherebox), a box (cr_crystalbox), a
+certain number of connected molecules (cr_molmotif),... In this case
+we'll use:
+
+    mol = cr_crystalbox(cr);
+
+The cr_crystalbox function takes a parallelepipedic region of the
+crystal cr and returns all the atoms inside it as a molecule (mol). We
+are using the default box, which goes from [-0.05,-0.05,-0.05] to
+[1.05,1.05,1.05]. This choice cuts out one unit cell and a small
+border around it.
+
+The newly-created mol is a molecule object: it is made of atoms at the
+geometry of the AgTaO<sub>3</sub> solid but it is not periodic
+anymore. From mol and cr, we now build a scene to be plotted,
+including the crystal unit cell:
+
+    rep = cr_unitcell(cr);
+
+the atoms rendered as balls:
+
+    rep = mol_ball(mol,rep);
+
+and the interatomic bonds represented as sticks:
+
+    rep = mol_stick(mol,rep);
+
+These three routines have oodles of arguments, like the color and size
+of the balls and sticks, which subset of atoms is represented, the
+textures, the distance criterion for bonding,... For now, we employ
+the (usually) reasonable defaults that are hardcoded in escher. As
+before, more information can be obtained with, for instance, 'help
+mol_ball' in the octave prompt. Next, we add the default setting of
+camera and lights: 
+
+    rep = rep_setdefaultscene(rep);
+
+and finally the scene is written to a
+[POV-Ray](http://www.povray.org/) and [wavefront
+obj](https://en.wikipedia.org/wiki/Wavefront_.obj_file) files:
+
+    rep_write_pov(rep,"agtao3.pov");
+    rep_write_obj(rep,"agtao3.obj");
+
+The rep_setdefaultscene() function sets the default orientation of the
+camera (which most of the time needs tweaking, I'll explain how below)
+and the lights (usually OK). These are necessary for the POV-Ray
+rendering, because the pov file describes the complete scene, ready to
+be rendered. The obj file, however, does not contain the position of
+camera or lights, and if you are proficient in any of the multiple
+programs that can read this format
+(e.g. [blender](http://www.blender.org/)) you may actually obtain
+better results by setting the scene up manually and rendering it.
+
+Now that we have written the most basic escher script possible, we run
+it with:
+
+    $ octave -q simple.m
+
+which creates the pov and the obj files. The pov file is rendered
+using:
+
+    $ povray -D -UV +Iagtao3.pov +Oagtao3.png +W1000 +H1000 +A
+
+Likewise, the obj file can be viewed, for instance, with blender or
+g3dviewer. It is easy to forget the povray command above, so I wrote
+it at the end of all the generated pov files:
+
+    $ tail -n 1 agtao3.pov 
+    //runme: povray -D -UV +Iagtao3.pov +Oagtao3.png +W1000 +H1000 +A
+
+After running povray, the resulting plot is:
+
+[[File:T4_agtao3a.png|frame|center]]
+
+which, let's face it, is not particularly impressive. As discussed
+before, the unit cell of AgTaO<sub>3</sub> is rhombohedral and, while
+this is convenient for the VASP calculation because it's
+computationally cheaper, it is difficult to visualize the geometry of
+the crystal in this setting. Consequently, we want to modify the
+script to transform the primitive into the particular cell that
+resembles the ideal cubic structure.
+
+To do this, we need to transform the cell vectors from the
+rhombohedral to the almost-cubic setting. A little bit of good old
+geometry reveals that the vectors of the cubic cell referred to the
+rhombohedral axes are [-1,1,1], [1,-1,1], and [1,1,-1]. There is a
+convenient function in molware for the unit cell transformation,
+called cr_newcell:
+
+    cr = cr_newcell(cr,[-1 1 1],[1 -1 1],[1 1 -1]);
+
+which revamps the entire crystal description (cell parameters, atomic
+positions, metric tensor,...) into the new setting. By inserting the
+previous line right after cr_read_vasp and running octave and povray
+again, we get:
+
+[[File:T4_agtao3b.png|frame|center]]
+
+which is most definitely cubic, but the plot could use some
+improvement in its orientation.  Precisely to address this issue, we
+have tweaked slightly a recent version of the [g3dviewer
+program](http://automagically.de/g3dviewer/), which is capable of
+reading an obj file, to output the orientation in a manner that is
+understandable to octave and escher. The installation of g3dviewer is
+described in the [[escher|escher#installation]] documentation.
+
+To obtain a good orientation for our plot, we open the file with
+g3dviewer and spin it around until we arrive at a nice orientation. If
+you are using our hacked version, numerous octave matrices will be
+output to the terminal. Copy the last one, which corresponds to the
+orientation currently displayed. In my case it looks like:
+
+    r = [
+         0.9130300879 -0.2160353959 0.3459838331 0.0000000000
+         0.3049260080 0.9248847365 -0.2271748185 0.0000000000
+         -0.2709173858 0.3129168749 0.9103223681 0.0000000000
+         0.0000000000 0.0000000000  0.0000000000 1.0000000000
+         ];
+
+The top left 3x3 block is the rotation matrix: this sets the necessary
+angles of the camera relative to the objects in the scene. The first
+three numbers in the fourth row are the translation vector, which we
+need to modify in order to make it move away from the center of
+projection. For this example, it is enough to set the translation to
+[0 0 -40]. The first three zeros in the fourth column represent the
+point at which the camera points. The null vector ([0 0 0]) tells
+escher that we want it to determine automatically the barycenter of
+the scene and point the camera at it. We insert this code in our
+script, which now looks like:
+
+    r = [
+         0.9130300879 -0.2160353959 0.3459838331 0.0000000000
+         0.3049260080 0.9248847365 -0.2271748185 0.0000000000
+         -0.2709173858 0.3129168749 0.9103223681 0.0000000000
+         0.0000000000 0.0000000000 -40.0000000000 1.0000000000
+         ];
+    rep = rep_setdefaultscene(rep,r);
+
+Note that I have modified the call to rep_setdefaultscene(rep,r) to
+pass the orientation matrix to it.
+
+After running povray and octave, the plots looks like: 
+
+[[File:T4_agtao3c.png|frame|center]]
+
+Now is when things get artsy. First, we to modify the radii of the
+atomic spheres. Even though Ag is a larger cation than Ta, it is
+occupying the voids so we would like it to be smaller. The Ta will
+also occupy the center of octahedra, so we don't want it to be very
+big either. Also, the only type of bond that actually makes sense is
+the Ta-O, so all bonds involving Ag should go away. The unit cell is
+not needed in the plot, since it is roughly depicted by the atomic
+distribution anyway. To do all this, we delete the call to
+cr_unitcell, and replace the calls to mol_stick and mol_ball with:
+
+    rep = mol_ball(mol,rep,"Ag",:,0.8);
+    rep = mol_ball(mol,rep,"Ta",:,0.6);
+    rep = mol_ball(mol,rep,"O",:,0.25);
+    rep = mol_stick(mol,rep,"Ta","O");
+
+Each of the calls to mol_ball adds the spheres corresponding only the
+specified type of atom. The field after the colon (which itself tells
+octave to assume a default value for a parameter that is not
+interesting at present) is the ball radius in angstrom, slightly
+smaller than the default, based on the covalent radii. By passing two
+atoms to mol_stick, only the sticks bonding those particular atoms are
+going to be represented. 
+
+As it is now, the structure is clear and the geometric arrangement is
+apparent, but we could make it look even prettier if we represented
+the polyhedra formed by the Ta and the O, as is done routinely for
+other solids, like the silicates. Escher has yet another function for
+that: mol_polyhedron. mol_polyhedron accepts two molecules and returns
+a representation. The first molecule, which is usually (but not
+necessarily) a subset of the second, contains the candidates for the
+center of the polyhedra. The second molecule contains the candidates
+for vertices. mol_polyhedron also needs the specification of the
+atomic type for the center (which is actually a regexp) and the
+vertices. In our case, we do:
+
+    molbig = cr_crystalbox(cr,[-0.5 -0.5 -0.5],[1.5 1.5 1.5]);
+    rep = mol_polyhedron(mol,molbig,rep,"Ta","O");
+
+Because we want the polyhedra whose center are already in the plot but
+we don't want the vertices, we use a bigger chunk of the crystal to
+provide the vertices for the routine. molbig contains all atoms within
+the parallelepiped specified by [-0.5,-0.5,-0.5] and [1.5,1.5,1.5] in
+crystallographic coordinates, more than enough for our purposes. Then
+we pass the molecule we already had (mol) as the generator of the
+vertices, the new supermolecule as the candidates for vertices
+(molbig) and specify that we want the Ta to be at the center and the O
+to be at the vertices. mol_polyhedron runs over mol looking for "Ta"
+centers and over molbig looking for "O" vertices. Whenever there are
+enough atoms in the appropriate (default) range of distances,
+mol_polyhedron builds a list with all of them and constructs the
+convex hull, which is written to the scene.
+
+We run escher and povray, and the resulting figure is:
+
+[[File:T4_agtao3d.png|frame|center]]
+
+Now, the default texture of the octahedra faces does not work that
+well in this case (it does in others, promise), so we want to make
+them to be in a different color and slightly less transparent. 
+
+In escher, the color is specified by a three-element row vector with
+integers from 0 to 255, corresponding to the RGB values. This vector
+can be optionally augmented by a fourth (filter transparency) and a
+fifth (transmit transparency) numbers, which by default assume a zero
+value (opaque). The filter transparency works by substracting
+wavelengths from the light passing through the surface. A completely
+filter-transparent object tints all light going through in its own
+color, much like cellophane. The transmit transparency works by
+letting only a certain amount of light going through, without
+modifying the wavelength intensities. A completely
+transmit-transparent object is invisible. These two transparency
+models are the same as in povray. Depending on the povray texture
+used, the transparency or even the color requirement made to escher
+may not be honored. There are textures (including the default texture
+for all objects in this example) for which all five integers affect
+the properties of the object. The glass-based textures, for instance,
+have a fixed transparency setting, so transmit and filter values are
+ignored. Some of the fancier textures also ignore the color.
+
+Back to our example, we modify the transmit value in mol_polyhedron to
+a value smaller than the default (225) to make the object less
+transparent. Also, to avoid the color clash with the atoms inside, we
+make the faces light green:
+
+    rep = mol_polyhedron(mol,molbig,rep,"Ta","O",:,[127 255 127 0 153]);
+
+The resulting figure looks like this:
+
+[[File:T4_agtao3_final.png|frame|center]]
+
+which is rather nice, and the
+[final
+script](http://gatsby.ucmerced.edu/downloads/tales/004/agtao3.m) in
+all its glory is: 
+
+    #! /usr/bin/octave -q
+    
+    cr = cr_read_vasp("POSCAR","POTCAR");
+    cr = cr_newcell(cr,[-1 1 1],[1 -1 1],[1 1 -1]);
+    mol = cr_crystalbox(cr);
+    molbig = cr_crystalbox(cr,[-0.5 -0.5 -0.5],[1.5 1.5 1.5]);
+    rep = representation();
+    rep = mol_ball(mol,rep,"Ag",:,0.8);
+    rep = mol_ball(mol,rep,"Ta",:,0.6);
+    rep = mol_ball(mol,rep,"O",:,0.25);
+    rep = mol_stick(mol,rep,"Ta","O");
+    rep = mol_polyhedron(mol,molbig,rep,"Ta","O",:,[127 255 127 0 153]);
+    r = [
+         0.9130300879 -0.2160353959 0.3459838331 0.0000000000
+         0.3049260080 0.9248847365 -0.2271748185 0.0000000000
+         -0.2709173858 0.3129168749 0.9103223681 0.0000000000
+         0.0000000000 0.0000000000 -40.0000000000 1.0000000000
+         ];
+    rep = rep_setdefaultscene(rep,r);
+    rep_write_pov(rep,"agtao3.pov");
+    rep_write_obj(rep,"agtao3.obj");
+
+Escher provides more options to make the plot even fancier (for
+instance, you can modify the texture on top of the color and the
+transparency parameters), but that is a different story and will be
+told in a different tale.
+
+[[User:Aoterodelaroza|Aoterodelaroza]] ([[User talk:Aoterodelaroza|talk]]) 19:25, 30 August 2013 (PDT)
+
+----
+{{Articles_all}}
+

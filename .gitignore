@@ -1,0 +1,10 @@
+*.png
+*tags
+*.obj
+*.off
+*.coff
+*.dat
+*.gnu
+*.mtl
+*.pov
+

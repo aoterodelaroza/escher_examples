@@ -1,0 +1,414 @@
+<h1 style="font-size:150%;"> Tale 13: Molecular plots with escher---the Kannemann-Becke set </h1>
+<div style="font-size:90%;">
+'''Adenine-thymine W''':
+[xyz file](http://gatsby.ucmerced.edu/downloads/tales/013/adenine_thymine_wcc1.xyz)
+[script](http://gatsby.ucmerced.edu/downloads/tales/013/atwcc.m)
+</div>
+<div style="font-size:90%;">
+'''Adenine-thymine stack, camera rotation''':
+[xyz file](http://gatsby.ucmerced.edu/downloads/tales/013/adenine_thymine_stack.xyz)
+[script](http://gatsby.ucmerced.edu/downloads/tales/013/atstack_phiscan.m)
+</div>
+<div style="font-size:90%;">
+'''Kannemann-Becke set''':
+[tar.bz2](http://gatsby.ucmerced.edu/downloads/kb65/kb65_xyz.tar.bz2)
+[script](http://gatsby.ucmerced.edu/downloads/tales/013/kb65.m).
+</div>
+
+[[Escher]] is a package of octave routines for publication-quality
+plotting of molecules and crystals.  In a previous [[Tale 4|Tale]] we
+demonstrated how escher can be used to generate high-quality representations
+of crystal structures, along with some basic crystallographic
+computations and format-conversions. Here, we do the same for small
+molecules and present how other octave routines can be combined with
+escher to good effect. The particular example we show in this Tale is
+how to convert a collection of small-size xyz files into a gallery of
+images. 
+
+There are two main advantages in using escher for your graphics:
+
+1. You have complete control of what goes into the plot. No matter how
+   good a GUI is, if you have used one enough, you probably know the
+   frustating feeling you get when you want to do something and it is
+   simply not possible. For instance, putting a bond between these two
+   atoms, or setting the atomic colors to some energy scale. Escher
+   is, in this sense, much more flexible than a graphical interface.
+   
+2. Escher uses a ray tracer ([povray](http://www.povray.org/)) for the
+   render, which is ultimately responsible for the good looks of the
+   plot. In a sense, escher is just a way to transform chemical
+   information into vertices and faces for povray. Other export
+   formats are also supported. For instance, wavefront obj files can
+   be written, and those can be opened, for instance, with
+   [blender](http://www.blender.org/). If you are proficient with
+   these kind of tools, then escher is definitely for you.
+   
+However:
+
+1. You have to write an [octave](http://www.gnu.org/software/octave/)
+   script. But as you'll see below it's not as bad as it sounds,
+   considering you can get a reasonable plot in just five lines.
+
+2. The orientation of the camera is always a pain in the posterior, as
+   was the case for
+   [tessel](http://azufre.quimica.uniovi.es/software.html#tessel),
+   escher's grand daddy. In this Tale we'll go over the most painless
+   ways of dealing with this issue. 
+   
+The state of escher at present is beyond experimental. Any and all
+parts of the code may change; no routine is safe from being rewritten
+overnight. 
+
+There are three basic type of *objects* in escher: crystals, molecules
+and representations. Crystals represent periodic and infinite
+solids. They are determined by the cell parameters and the
+crystallographic positions of the atoms. A molecule is also formed by
+atoms, but it's finite instead of periodic. A representation is a
+piece of a crystal or a molecule which is staged for plotting. It no
+longer contains atoms, but spheres, sticks, lights, cameras and all
+the kind of things that belong to a ray tracer scene. The majority of
+the escher routines deal on how to transform these objects into one
+another.
+
+Let's start with a simple example. This [xyz
+file](http://gatsby.ucmerced.edu/downloads/tales/013/adenine_thymine_wcc1.xyz)
+contains the geometry of the adenine/thymine dimer in its W
+conformation, the one that occurs naturally in DNA. The conformation
+presents two hydrogen bonds between the monomers. This is also one of
+the dimers in the [[Benchmark data|Kannemann-Becke (KB) set]]
+<cite>kannemann2010</cite>, which we use as training set for the
+damping function parameters in the [[XDM]] method
+<cite>xdmhybrid</cite>. We open an octave interactive session and
+begin our work by creating a molecule object by reading the xyz file,
+with the aptly-named `mol_readxyz` function:
+
+    mol = mol_readxyz("adenine_thymine_wcc1.xyz");
+
+The 'mol' variable is just a structure containing
+the fields atname (names of the atoms), atnumber ( atomic numbers),
+atxyz (coordinates in angstrom) and atmass (the atomic masses). Unlike
+most programs out there, `mol_readxyz` reads xyz files where the first
+column is the atomic number instead of the atomic symbol, like the one
+in the example above.
+
+Now, let's build the scene and put some objects in it. We first create
+the balls representing the atoms:
+
+    rep = mol_ball(mol);
+
+`mol_ball` has a lot of options, but we expect that escher will come up
+with some reasonable defaults regarding color, texture, and size of
+the atoms. The 'rep' object created by the previous call contains
+fields for spheres, sticks, lights, the background color, camera, and
+so on. Now, we create the sticks:
+
+    rep = mol_stick(mol,rep);
+
+The syntax is pretty much the same as `mol_ball`, except that this
+time we pass the representation 'rep' as the second argument. This is
+done so that `mol_stick` adds to the representation, instead of creating a new one, as
+we did in the previous call to `mol_ball`. The default behavior is to
+place sticks between atoms that are within a certain distance
+determined by the sum of the covalent radii times a constant
+factor. Although these radii can be modified, `mol_stick` permits fine
+control (down to a single atom, in combination with other routines) of
+which atoms are bonded to which, in addition to the color and
+texture of the sticks. For now, let's stick (pun intended) to the
+defaults.
+
+We have the molecule in place, but there are still two missing pieces
+in our scene: the lights and the camera. Given that the position of
+these two objects is closely related, escher provides a routine to set
+some default lighting and camera positoin, based on the size of the
+scene and its center of mass. It is:
+
+    rep = rep_setdefaultscene(rep);
+
+This routine is so convenient that I've hardly ever set the lights by
+hand in any of my scripts. To conclude, we write the representation to a
+povray input file: 
+
+    rep_write_pov(rep,"atwcc.pov");
+
+This command creates the `atwcc.pov` povray input file. The `png`
+files is rendered by doing:
+
+    $ povray -D -UV +Iatwcc.pov +Oatwcc.png +W2000 +H2000 +A
+
+in the shell. The resulting plot is:
+
+[[File:T13_02_adenine_thymine_wcc1.png|500px|thumb|center|Carbons should be BLACK. Black as night; black as coal. Speakers using [http://www.ks.uiuc.edu/Research/vmd/ CYAN carbons]
+in their slides are asking for a squad of oompa-loompas to kindly sing them to the venue's closest emergency exit.]]
+
+and the complete script can be downloaded from
+[here](http://gatsby.ucmerced.edu/downloads/tales/013/atwcc.m). 
+
+Unfotunately for us, achieving a nice-looking plot is often not as
+easy as in the previous example because the default camera position
+and orientation needs tweaking. For instance, let's consider the
+stacked
+[adenine-thymine dimer](http://gatsby.ucmerced.edu/downloads/tales/013/adenine_thymine_stack.xyz). Using
+the same script as above on this molecule gives:
+
+[[File:T13_atstack_badcam.png|250px|thumb|center]]
+
+The reason why this figure looks like a mess is that too many sticks
+and balls are overlapping. The problem aggravates as the number of
+atoms and bonds increases, and is particularly apparent in
+representations derived from a crystal structure. 
+
+There are two ways of setting the camera in escher. The first option
+is similar to
+[tessel](http://azufre.quimica.uniovi.es/software.html#tessel), and
+uses internally the `rep_addcamera` routine. By doing:
+
+    rep = rep_setdefaultscene(rep,[40 90 45]);
+
+`rep_addcamera` is a simple spherical-coordinates scheme to set the
+position of the camera. We place the camera at $\phi = 40$ degrees
+separation from the z-axis (that is, +60 degrees elevation over the xy
+plane), rotated $\theta = 90$ degrees around z and the distance from
+the origin is set by requiring that the field of view of the camera is
+45 degrees (smaller angles place the camera further from the
+molecule). Once the camera is in position, it is rotated so as to
+point to the barycenter of the scene. The coordinate system of the
+camera is set to a constant default orientation.
+
+A convenient function to use when setting the camera by hand is
+`rep_refaxes`, which adds a representation of the coordinate system
+(x=red, y=green, z=blue) to the picture.
+
+    rep_refaxes(rep,2,0.1);
+	
+adds the coordinate sticks to the representation rep, their length
+scaled by a factor of 2 and their thickness equal to 0.1. Here is an
+[example](http://gatsby.ucmerced.edu/downloads/tales/013/atstack_phiscan.m)
+where we set the $\phi$ angle in `rep_addcamera` to 0, 30, 60, 90, 120,
+150, and 180 in sequence: 
+
+<gallery widths="150px" heights="150px">
+File:T13_atstack_phi000.png
+File:T13_atstack_phi030.png
+File:T13_atstack_phi060.png
+File:T13_atstack_phi090.png
+File:T13_atstack_phi120.png
+File:T13_atstack_phi150.png
+File:T13_atstack_phi180.png
+</gallery>
+
+For plots of simple molecules `rep_addcamera` is usually good
+enough. 
+
+The second option for placing the camera is passing a 4 $\times$ 4 or
+a 4 $\times$ 3 matrix to `rep_setdefaultscene`, a method has been
+explored in a [[Tale 4|previous tale]] for the AgTaO~3~ crystal. The
+matrix mostly corresponds to an OpenGL modelview matrix; its inverse
+is applied to perform the camera rotation. The matrix has this
+structure:
+
+    [        |   ]
+    [   R    | v ]
+    [        |   ]
+    ---------+---]
+    [   c    | 1 ]
+
+The 3x3 block R is the rotation matrix: the scene is rotated using R
+relative to the camera in the starting orientation (or, equivalently,
+the camera is rotated inv(R)). The vector v is the point where the
+camera is located before the rotation and translation is applied. If v
+is not indicated (because the input r is of dimension 
+4 $\times$ 3), then it is calculated as the center-of-mass of the
+representation. In most of the cases, the barycenter is the most
+desirable choice. 
+
+Finally, c is the translation vector controlling the location of the
+camera. -c is the displacement of the camera previous to the R
+rotation. Because the translation is applied before the rotation, the
+simplest choice is [0 0 -x] where x is the intended distance to the
+center of the scene. This ensures that the camera ends up pointing at
+the center. 
+
+A simple example of modelview matrix would be:
+
+    r = [eye(3); 0 0 -20]
+
+which sets the camera pointing down along the z axis, at a distance of
+20 angstrom from the center of mass. Again, `rep_refaxes()` can be
+used, combined with the `op_rotx()`, `op_roty()` and
+`op_rotz()` functions. These functions take an angle as argument (and
+possibly a translation vector t) and return a 4x4 matrix with the
+structure: 
+
+    [        |   ]
+    [   R    | 0 ]
+    [        |   ]
+    ---------+---]
+    [   t    | 1 ]
+
+where R is the rotation matrix around the specified axis by the given
+angle (by default, t is the null vector). The camera matrix can be
+modified by successively applying `op_rot` functions. For instance:
+
+    r = op_roty(50) * op_rotx(45) * [eye(3); 0 0 -20];
+
+performs a 45-degree rotation around x, then a 50-degree rotation
+around y. 
+
+The reason why we use the modelview matrix technique is that most
+visualization programs out there use one internally. Ideally, we would
+like to write a file containing the scene in a format understandable
+by some visualization program, then open it and make the program tell
+us the r matrix, which we would then copy into the octave script. We
+have modified [g3dviewer](http://automagically.de/g3dviewer/), which
+accepts wavefront obj files, to print the modelview matrix of the
+scene displayed for us. This is only a temporary solution (a dirty
+hack, if you may) until the python graphical interface is ready. This
+method is used in [[Tale 4]], and involves using `rep_write_obj`,
+which does not require setting the camera or the lights with
+`rep_setdefaultscene`. After g3dviewer is used on the generated obj
+file, we copy the r produced by the program, use
+`rep_setdefaultscene` followed by `rep_write_pov`. 
+
+To conclude with the camera discussion, I'd like to point out that
+`rep_setdefaultscene()` accepts two optional arguments on top of rep
+and r: the camera angle and the perspective. 
+
+    rep_setdefaultscene(rep,r,angle,persp)
+
+The camera angle sets the field of view: the higher it is, the closer
+the object will appear when rendered. In povray terms, this is done by
+scaling the length of the camera's direction vector. The default value
+is 45 degrees. The perspective argument controls whether orthographic
+(persp=0) or perspective (persp=1) projection is used. Perspective
+projection is the default.
+
+To wrap up this tale, let's use an octave loop to plot all the 65
+dimers in the [[Benchmark data|Kannemann-Becke (KB) set]] with a
+single script. Because the KB set is composed of small molecules, we
+can obtain good orientations by using either the default camera
+setting, or `r = [eye(3); 0 0 -20]`. The archive containing the
+structures can be downloaded
+[here](http://gatsby.ucmerced.edu/downloads/kb65/kb65_xyz.tar.bz2). We
+start our script by defining the list of dimers we want to plot:
+
+    list = {"adenine_thymine_stack","adenine_thymine_wcc1","ar_ar","ar_kr","c10h8_c10h8_pc",...
+            "c10h8_c10h8_p","c10h8_c10h8_tc","c10h8_c10h8_t","c2h2_c2h2","c2h4_c2h2","c2h4_c2h4",...
+            "c2h4_hf","c6h6_c6h6_pd","c6h6_c6h6_stack","c6h6_c6h6_t","c6h6_ch4","c6h6_h2o","c6h6_hcn"...
+            "c6h6_ne","c6h6_nh3","cf4_cf4","ch3cl_hcl","ch3cn_ch3cn","ch3f_ch3f","ch3sh_hcl","ch4_c2h4",...
+            "ch4_ch4","ch4_hf","ch4_ne","ch4_nh3","co2_co2","fcl_he","formamide_formamide","h2co2_h2co2",...
+            "h2co_h2co","h2o_h2o","h2s_h2s","h2s_hcl","hcl_hcl","hcn_ch3sh","hcn_hf","he_ar",...
+            "he_fcl","he_he","he_kr","he_n2_l","he_n2_t","he_ne","hf_hf","indole_c6h6_stack","indole_c6h6_t",...
+            "kr_kr","ne_ar","ne_kr","ne_ne","nh3_h2o","nh3_nh3","ocs_ocs","phenol_phenol","pyrazine_pyrazine",...
+            "pyridoxine_aminopyridine","sih4_ch4","sih4_hf","uracil_uracil_hb","uracil_uracil_stack"};
+
+Then, we choose which of these should use the default camera
+orientation and which should employ the modelview matrix indicated
+above. In order to do this, we define an array `rlist` that is zero at
+the dimer indices for which we want the default camera, and 1
+otherwise: 
+
+    rlist = zeros(1,length(list));
+    rlist([01 09 13 14 17 18 19 20 22 23 24 25 31 33 34 35 36 37 38 39 40 49 51 56 57 58 59 60 61 64]) = 1;
+
+For any particular dimer, the choice is made by doing a preparation
+run of the script, in which we pick the camera orientation that looks
+best.   
+
+Next, we run over all dimers and build a representation using all the
+default options: 
+
+    for i = 1:length(list)
+      mol = mol_readxyz(sprintf("%s.xyz",list{i}));
+      rep = mol_ball(mol);
+      rep = mol_stick(mol,rep);
+
+Then, we set the default scene by using the `rlist` defined above:
+      if (rlist(i) > 0)
+        rep = rep_setdefaultscene(rep,[eye(3); 0 0 -20]);
+      else
+        rep = rep_setdefaultscene(rep);
+      endif
+
+
+Finally, we write the pov, run povray and crop the margins using
+imagemagick's `convert` tool:
+
+      name = sprintf("%2.2d_%s",i,list{i});
+      rep_write_pov(rep,sprintf("%s.pov",name));
+      system(sprintf("povray -D -UV +I%s.pov +O%s.png +W1000 +H1000 +A",name,name));
+      system(sprintf("convert -trim -bordercolor White -border 0x0 +repage %s.png %s_crop.png",name,name));
+      system(sprintf("mv %s_crop.png %s.png;",name,name));
+    endfor
+
+The execution of [this script](http://gatsby.ucmerced.edu/downloads/tales/013/kb65.m) generates the 65 png files, along with their povray inputs. These are the KB65 dimers, as rendered by escher:
+
+<gallery widths="100px" heights="100px">
+File:T13_01_adenine_thymine_stack.png
+File:T13_02_adenine_thymine_wcc1.png
+File:T13_03_ar_ar.png
+File:T13_04_ar_kr.png
+File:T13_05_c10h8_c10h8_pc.png
+File:T13_06_c10h8_c10h8_p.png
+File:T13_07_c10h8_c10h8_tc.png
+File:T13_08_c10h8_c10h8_t.png
+File:T13_09_c2h2_c2h2.png
+File:T13_10_c2h4_c2h2.png
+File:T13_11_c2h4_c2h4.png
+File:T13_12_c2h4_hf.png
+File:T13_13_c6h6_c6h6_pd.png
+File:T13_14_c6h6_c6h6_stack.png
+File:T13_15_c6h6_c6h6_t.png
+File:T13_16_c6h6_ch4.png
+File:T13_17_c6h6_h2o.png
+File:T13_18_c6h6_hcn.png
+File:T13_19_c6h6_ne.png
+File:T13_20_c6h6_nh3.png
+File:T13_21_cf4_cf4.png
+File:T13_22_ch3cl_hcl.png
+File:T13_23_ch3cn_ch3cn.png
+File:T13_24_ch3f_ch3f.png
+File:T13_25_ch3sh_hcl.png
+File:T13_26_ch4_c2h4.png
+File:T13_27_ch4_ch4.png
+File:T13_28_ch4_hf.png
+File:T13_29_ch4_ne.png
+File:T13_30_ch4_nh3.png
+File:T13_31_co2_co2.png
+File:T13_32_fcl_he.png
+File:T13_33_formamide_formamide.png
+File:T13_34_h2co2_h2co2.png
+File:T13_35_h2co_h2co.png
+File:T13_36_h2o_h2o.png
+File:T13_37_h2s_h2s.png
+File:T13_38_h2s_hcl.png
+File:T13_39_hcl_hcl.png
+File:T13_40_hcn_ch3sh.png
+File:T13_41_hcn_hf.png
+File:T13_42_he_ar.png
+File:T13_43_he_fcl.png
+File:T13_44_he_he.png
+File:T13_45_he_kr.png
+File:T13_46_he_n2_l.png
+File:T13_47_he_n2_t.png
+File:T13_48_he_ne.png
+File:T13_49_hf_hf.png
+File:T13_50_indole_c6h6_stack.png
+File:T13_51_indole_c6h6_t.png
+File:T13_52_kr_kr.png
+File:T13_53_ne_ar.png
+File:T13_54_ne_kr.png
+File:T13_55_ne_ne.png
+File:T13_56_nh3_h2o.png
+File:T13_57_nh3_nh3.png
+File:T13_58_ocs_ocs.png
+File:T13_59_phenol_phenol.png
+File:T13_60_pyrazine_pyrazine.png
+File:T13_61_pyridoxine_aminopyridine.png
+File:T13_62_sih4_ch4.png
+File:T13_63_sih4_hf.png
+File:T13_64_uracil_uracil_hb.png
+File:T13_65_uracil_uracil_stack.png
+</gallery>
+
+[[User:Aoterodelaroza|Aoterodelaroza]] ([[User talk:Aoterodelaroza|talk]]) 23:00, 19 September 2013 (PDT)
+
