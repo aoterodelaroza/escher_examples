@@ -1,0 +1,192 @@
+
+     Program PWSCF v.4.3.2      starts on  7May2013 at 10:10:20 
+
+     This program is part of the open-source Quantum ESPRESSO suite
+     for quantum simulation of materials; please cite
+         "P. Giannozzi et al., J. Phys.:Condens. Matter 21 395502 (2009);
+          URL http://www.quantum-espresso.org", 
+     in publications or presentations arising from this work. More details at
+     http://www.quantum-espresso.org/wiki/index.php/Citing_Quantum-ESPRESSO
+
+     Current dimensions of program PWSCF are:
+     Max number of different atomic species (ntypx) = 10
+     Max number of k-points (npk) =  40000
+     Max angular momentum in pseudopotentials (lmaxx) =  3
+     Waiting for input...
+     Reading input from stdin
+               file h.UPF: wavefunction(s)  1S renormalized
+               file c.UPF: wavefunction(s)  2P renormalized
+               file n.UPF: wavefunction(s)  2P renormalized
+ 
+     G-vector sticks info
+     --------------------
+     sticks:   dense  smooth     PW     G-vecs:    dense   smooth      PW
+     Sum       15639    6255   1641              1065833   269647   36165
+ 
+
+     Title: 
+     crystal                                                                    
+
+
+     bravais-lattice index     =            0
+     lattice parameter (alat)  =       1.0000  a.u.
+     unit-cell volume          =    4294.5809 (a.u.)^3
+     number of atoms/cell      =           60
+     number of atomic types    =            3
+     number of electrons       =       176.00
+     number of Kohn-Sham states=           88
+     kinetic-energy cutoff     =      60.0000  Ry
+     charge density cutoff     =     600.0000  Ry
+     convergence threshold     =      1.0E-08
+     mixing beta               =       0.7000
+     number of iterations used =            8  plain     mixing
+     Exchange-correlation      =  NOX  PW   PW86 PBC ( 0 417 4 0)
+     EXX-fraction              =        0.00
+     nstep                     =           50
+
+
+     celldm(1)=   1.000000  celldm(2)=   0.000000  celldm(3)=   0.000000
+     celldm(4)=   0.000000  celldm(5)=   0.000000  celldm(6)=   0.000000
+
+     crystal axes: (cart. coord. in units of alat)
+               a(1) = (  25.524531   0.000000   0.000000 )  
+               a(2) = (   0.000000  12.829351   0.000000 )  
+               a(3) = (   0.000000   0.000000  13.114699 )  
+
+     reciprocal axes: (cart. coord. in units 2 pi/alat)
+               b(1) = (  0.039178  0.000000  0.000000 )  
+               b(2) = (  0.000000  0.077946  0.000000 )  
+               b(3) = (  0.000000  0.000000  0.076250 )  
+
+
+     PseudoPot. # 1 for  H read from file:
+     ./h.UPF
+     MD5 check sum: 465503140a8a8e79e3a70d3488897feb
+     Pseudo is Projector augmented-wave, Zval =  1.0
+     Generated using "atomic" code by A. Dal Corso  (Quantum ESPRESSO distribution)
+     Shape of augmentation charge: PSQ
+     Using radial grid of  929 points,  2 beta functions with: 
+                l(1) =   0
+                l(2) =   0
+     Q(r) pseudized with 0 coefficients 
+
+
+     PseudoPot. # 2 for  C read from file:
+     ./c.UPF
+     MD5 check sum: 59d3a4af416b94ce846c69cefa103580
+     Pseudo is Projector augmented-wave + core cor, Zval =  4.0
+     Generated using "atomic" code by A. Dal Corso  (Quantum ESPRESSO distribution)
+     Shape of augmentation charge: BESSEL
+     Using radial grid of 1073 points,  4 beta functions with: 
+                l(1) =   0
+                l(2) =   0
+                l(3) =   1
+                l(4) =   1
+     Q(r) pseudized with 0 coefficients 
+
+
+     PseudoPot. # 3 for  N read from file:
+     ./n.UPF
+     MD5 check sum: e0ff3f45b53a91ae99b5aaaaf06c1d8e
+     Pseudo is Projector augmented-wave + core cor, Zval =  5.0
+     Generated using "atomic" code by A. Dal Corso  (Quantum ESPRESSO distribution)
+     Shape of augmentation charge: PSQ
+     Using radial grid of 1085 points,  4 beta functions with: 
+                l(1) =   0
+                l(2) =   0
+                l(3) =   1
+                l(4) =   1
+     Q(r) pseudized with 0 coefficients 
+
+
+     atomic species   valence    mass     pseudopotential
+        h              1.00     1.00794      H( 1.00)
+        c              4.00    12.01070      C( 1.00)
+        n              5.00    14.00670      N( 1.00)
+
+      4 Sym.Ops. (no inversion)
+
+
+   Cartesian axes
+
+     site n.     atom                  positions (alat units)
+         1           c   tau(   1) = (  18.9443068   7.7502108   5.6235831  )
+         2           c   tau(   2) = (  19.3424895   1.3355354  12.1809328  )
+         3           c   tau(   3) = (   6.1820414  11.4938153   5.6235831  )
+         4           c   tau(   4) = (   6.5802241   5.0791399  12.1809328  )
+         5           c   tau(   5) = (  22.0761668   6.2927965   3.4701495  )
+         6           c   tau(   6) = (  16.2106296  12.7074719  10.0274991  )
+         7           c   tau(   7) = (   9.3139013   0.1218788   3.4701495  )
+         8           c   tau(   8) = (   3.4483641   6.5365542  10.0274991  )
+         9           c   tau(   9) = (  24.0977096   5.9348576   1.8360579  )
+        10           c   tau(  10) = (  14.1890867  12.3495330   8.3934076  )
+        11           c   tau(  11) = (  11.3354442   0.4798177   1.8360579  )
+        12           c   tau(  12) = (   1.4268213   6.8944931   8.3934076  )
+        13           c   tau(  13) = (  25.3279920   3.6217257   1.9331067  )
+        14           c   tau(  14) = (  12.9588043  10.0364011   8.4904564  )
+        15           c   tau(  15) = (  12.5657266   2.7929497   1.9331067  )
+        16           c   tau(  16) = (   0.1965389   9.2076250   8.4904564  )
+        17           c   tau(  17) = (  24.5290742   1.7242647   3.6157226  )
+        18           c   tau(  18) = (  13.7577221   8.1389401  10.1730723  )
+        19           c   tau(  19) = (  11.7668087   4.6904106   3.6157226  )
+        20           c   tau(  20) = (   0.9954567  11.1050860  10.1730723  )
+        21           c   tau(  21) = (  22.5356083   2.0488473   5.2327650  )
+        22           c   tau(  22) = (  15.7511880   8.4635227  11.7901147  )
+        23           c   tau(  23) = (   9.7733429   4.3658280   5.2327650  )
+        24           c   tau(  24) = (   2.9889226  10.7805034  11.7901147  )
+        25           c   tau(  25) = (  21.3257455   4.3991844   5.1514539  )
+        26           c   tau(  26) = (  16.9610508  10.8138597  11.7088036  )
+        27           c   tau(  27) = (   8.5634801   2.0154910   5.1514539  )
+        28           c   tau(  28) = (   4.1987853   8.4301664  11.7088036  )
+        29           n   tau(  29) = (  19.3220699   5.3626686   6.5009565  )
+        30           n   tau(  30) = (  18.9647264  11.7773440  13.0583062  )
+        31           n   tau(  31) = (   6.5598044   1.0520068   6.5009565  )
+        32           n   tau(  32) = (   6.2024610   7.4666821  13.0583062  )
+        33           n   tau(  33) = (  20.5191704   8.3826978   3.8098202  )
+        34           n   tau(  34) = (  17.7676259   1.9680224  10.3671698  )
+        35           n   tau(  35) = (   7.7569049  10.8613283   3.8098202  )
+        36           n   tau(  36) = (   5.0053605   4.4466530  10.3671698  )
+        37           h   tau(  37) = (  17.4864732   9.0081158   6.3497964  )
+        38           h   tau(  38) = (  20.8003231   2.5934404  12.9071461  )
+        39           h   tau(  39) = (   4.7242078  10.2359103   6.3497964  )
+        40           h   tau(  40) = (   8.0380576   3.8212349  12.9071461  )
+        41           h   tau(  41) = (  24.6934419   7.4102586   0.5309512  )
+        42           h   tau(  42) = (  13.5933544   0.9955833   7.0883009  )
+        43           h   tau(  43) = (  11.9311765  11.8337674   0.5309512  )
+        44           h   tau(  44) = (   0.8310889   5.4190921   7.0883009  )
+        45           h   tau(  45) = (   1.4069249   3.2703811   0.6919525  )
+        46           h   tau(  46) = (  11.3553405   9.6850565   7.2493022  )
+        47           h   tau(  47) = (  14.1691903   3.1442942   0.6919525  )
+        48           h   tau(  48) = (  24.1176060   9.5589696   7.2493022  )
+        49           h   tau(  49) = (   0.0102300  12.7582761   3.6324701  )
+        50           h   tau(  50) = (  12.7520355   6.3436008  10.1898198  )
+        51           h   tau(  51) = (  12.7724954   6.4857500   3.6324701  )
+        52           h   tau(  52) = (  25.5143009   0.0710746  10.1898198  )
+        53           h   tau(  53) = (  21.9243468   0.5583590   6.5133105  )
+        54           h   tau(  54) = (  16.3624495   6.9730344  13.0706602  )
+        55           h   tau(  55) = (   9.1620814   5.8563164   6.5133105  )
+        56           h   tau(  56) = (   3.6001840  12.2709917  13.0706602  )
+        57           h   tau(  57) = (  18.3254135   4.4707208   7.8757573  )
+        58           h   tau(  58) = (  19.9613828  10.8853962   1.3184076  )
+        59           h   tau(  59) = (   5.5631481   1.9439545   7.8757573  )
+        60           h   tau(  60) = (   7.1991174   8.3586299   1.3184076  )
+
+     number of k points=     1
+                       cart. coord. in units 2pi/alat
+        k(    1) = (   0.0097945   0.0194866   0.0190626), wk =   2.0000000
+
+     Dense  grid:  1065833 G-vectors     FFT dimensions: ( 200, 108, 108)
+
+     Smooth grid:   269647 G-vectors     FFT dimensions: ( 125,  64,  72)
+
+     Largest allocated arrays     est. size (Mb)     dimensions
+        Kohn-Sham Wavefunctions        45.25 Mb     (  33698,   88)
+        NL pseudopotentials           172.77 Mb     (  33698,  336)
+        Each V/rho on FFT grid         35.60 Mb     (2332800)
+        Each G-vector array             8.13 Mb     (1065833)
+        G-vector shells                 8.13 Mb     (1065833)
+     Largest temporary arrays     est. size (Mb)     dimensions
+        Auxiliary wavefunctions       181.00 Mb     (  33698,  352)
+        Each subspace H/S matrix        1.89 Mb     ( 352, 352)
+        Each <psi_i|beta_j> matrix      0.45 Mb     (    336,   88)
+        Arrays for rho mixing         284.77 Mb     (2332800,   8)
