@@ -26,7 +26,7 @@ for i = 1:length(texdb)
   endif
 endfor
 
-rep = rep_setdefaultscene_tessel(rep);
+rep = rep_setdefaultscene(rep);
 rep_write_pov(rep,"textures.pov");
 run_povray("textures");
 

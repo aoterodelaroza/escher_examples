@@ -48,7 +48,7 @@ mol = mol_readxyz("NH3_NIS.xyz");
 rep = representation_();
 rep = mol_ball(mol,rep);
 rep = mol_stick(mol,rep);
-rep = rep_setdefaultscene_tessel(rep);
+rep = rep_setdefaultscene(rep);
 rep_write_pov(rep,"NH3_NIS.pov");
 run_povray("NH3_NIS");
 
@@ -67,7 +67,7 @@ for i = 1:n
     rep = mol_ball(mol_getfragment(mol,[j]),rep,:,:,:,colorscale(di(i,j),mdi));
   endfor
   rep = mol_stick(mol,rep);
-  rep = rep_setdefaultscene_tessel(rep);
+  rep = rep_setdefaultscene(rep);
   rep_write_pov(rep,sprintf("%s.pov",name));
   run_povray(name);
 endfor
