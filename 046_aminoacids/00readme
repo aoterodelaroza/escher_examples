@@ -1,0 +1,7 @@
+2016-03-09 (VLC) Use the smiles description of aminoacids to start plotting
+each individual molecule.
+
+Example of using the open babel code (obabel) to obtain 3D coordinates
+from the smiles description of a molecule ans use the information to
+produce a ball and stick representation od the compound, in this case
+any of the 22 matural amino acids.
