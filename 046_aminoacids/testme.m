@@ -51,5 +51,5 @@ for i = 1:length(aminoacids)
   rep_write_off(rep,sprintf("%s.off",aa));
   rep_write_obj(rep,sprintf("%s.obj",aa));
   run_povray(aa);
-  printf "%s(pov,off,obj,png) created", aa
+  printf("%s(pov,off,obj,png) created", aa);
 end
