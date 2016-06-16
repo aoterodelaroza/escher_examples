@@ -8,6 +8,8 @@
 *.gnu
 *.mtl
 *.pov
+*.incritic
+*.tess
 
 # emacs backups
 *~
