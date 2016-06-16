@@ -6,4 +6,4 @@ rep = mol_ball(mol,rep,"C",:,:,[10 10 10]);
 rep = mol_stick(mol,rep,"C","H");
 rep = mol_stick(mol,rep,"C","C");
 rep_write_obj(rep,"large.obj");
-rep = rep_setdefaultscene(rep,r,0);
+rep = rep_setdefaultscene(rep,0);
