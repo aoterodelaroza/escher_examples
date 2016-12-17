@@ -1,5 +1,7 @@
 #! /usr/bin/octave -q
 
+## water dimer ##
+
 # from critic2:
 r0 = [-0.049476    9.251742    3.323199];
 r1 = [-0.203016    1.904580    3.323199];
@@ -23,7 +25,9 @@ rep_write_obj(rep,"h2o_h2o.obj");
 
 rep = rep_setdefaultscene_view3dscene(rep,[1.71 2.76 8.40],[0 0 -1],[0 1 0]);
 rep_write_pov(rep,"h2o_h2o.pov");
-run_povray("h2o_h2o")
+run_povray("h2o_h2o");
+
+## benzene dimer ##
 
 # from critic2:
 r0 = [5.934430    0.000000    0.000000];
@@ -47,4 +51,21 @@ rep_write_obj(rep,"c6h6_c6h6.obj");
 
 rep = rep_setdefaultscene_view3dscene(rep,[9.72 12.65 8.31],[-0.53 -0.73 -0.43],[-0.23 -0.36 0.90]);
 rep_write_pov(rep,"c6h6_c6h6.pov");
-system("povray -D -UV +Ic6h6_c6h6.pov +Oc6h6_c6h6.png +W1000 +H1000 +A");
+run_povray("c6h6_c6h6");
+
+## hydrazine ##
+dih = [4 1 2 5];
+
+mol = mol_readxyz("h2nnh2.xyz");
+rep = representation_();
+rep = mol_ball(mol,rep,:,:,-0.3);
+rep = mol_stick(mol,rep);
+[dh x1 x2] = mol_dihedral(mol,dih(1),dih(2),dih(3),dih(4),[0.4 0.4 0.4]);
+rep = rep_polygon(rep,x1,[0 0 128 0 128],[0 0 128]);
+rep = rep_polygon(rep,x2,[0 128 0 0 128],[0 128 0]);
+rep_write_obj(rep,"h2nnh2.obj");
+
+rep = rep_setdefaultscene_view3dscene(rep,[-2.06 5.15 1.11],[0.33 -0.93 -0.13],[-0.52 -0.30 0.80]);
+rep_write_pov(rep,"h2nnh2.pov");
+run_povray("h2nnh2");
+
