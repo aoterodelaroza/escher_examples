@@ -18,3 +18,21 @@ rep_write_obj(rep,"h2o.obj");
 rep_write_pov(rep,"h2o.pov");
 run_povray("h2o");
 
+mol = mol_readxyz("ch4_ch4.xyz");
+rep = representation_();
+rep = mol_ball(mol,rep,{"C","H"},:,-0.2);
+rep = mol_ball(mol,rep,"X.?",1,-0.4);
+rep = rep_setdefaultscene_view3dscene(rep,[11.03 12.95 23.28],[0 0 -1],[0 1 0],:,:,:,0);
+rep_write_obj(rep,"ch4_ch4.obj");
+rep_write_pov(rep,"ch4_ch4.pov");
+run_povray("ch4_ch4");
+
+mol = mol_readxyz("h2o_h2o.xyz");
+rep = representation_();
+rep = mol_ball(mol,rep,{"O","H"},:,-0.2);
+rep = mol_ball(mol,rep,"X.?",1,-0.4);
+rep = rep_setdefaultscene_view3dscene(rep,[10.50 11.97 17.29],[0 0 -1],[0 1 0],:,:,:,0);
+rep_write_obj(rep,"h2o_h2o.obj");
+rep_write_pov(rep,"h2o_h2o.pov");
+run_povray("h2o_h2o");
+
